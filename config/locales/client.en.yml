@@ -1,6 +1,6 @@
 en:
   js:
     composer:
-      quick_placeholder: "Type a message."
+      quick_placeholder: "Bir mesaj girin."
     user:
-      no_quick_messages: "No messages yet."
+      no_quick_messages: "Henüz mesaj yok."
