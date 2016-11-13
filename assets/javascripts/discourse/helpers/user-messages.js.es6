@@ -31,14 +31,24 @@ export function getCurrentUserMessages(context) {
   })
 }
 
-export function getCurrentUserMessageCount(context) {
+export function getCurrentUserMessageCount(context, docked) {
   const store = context.container.lookup('store:main'),
-        username = context.currentUser.get('username');
+        username = context.currentUser.get('username'),
+        topicController = context.container.lookup('controller:topic'),
+        topic = topicController ? topicController.get('model') : false;
 
   return store.findFiltered("topicList", {filter: "topics/private-messages/" + username}).then((result) => {
-    let unread = result.topics.filter((m) => {
-      return m.subtype == 'user_to_user' && m.last_read_post_number != m.highest_post_number
+
+    let unreadMessages = result.topics.filter((m) => {
+      return m.subtype === 'user_to_user' && m.get('last_read_post_number') < m.get('highest_post_number')
+             && docked.indexOf(m.id) === -1 && (!topic || !topic.get('id') === m.id)
     })
-    return unread.length
+
+    let unreadCount = 0
+    unreadMessages.forEach((m) => {
+      unreadCount += m.get('highest_post_number') - m.get('last_read_post_number')
+    })
+
+    return unreadCount
   })
 }
